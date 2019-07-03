@@ -9,6 +9,15 @@ var unirest = require('unirest');
 
 var mysql = require('mysql')
 
+var {db_config} = require('../config/configData');
+var {db_config_per} = require('../config/configData');
+
+db_config =  db_config
+
+//console.log("dddd"+db_config);
+
+//var db_config =dbConfig;
+//var {db_config = dbConfig
 
 const apiKey = "1a2b3c4d5e6d"
 const contTitle = "ระบบจัดการโปรแกรม"
@@ -18,12 +27,7 @@ let login
 // https://taladsrimuang.com/office/people/resize/resize_15501_PR3.jpg
 
 //**** data Service  */
-var db_config = {
-  host: 'localhost',
-  user: 'root',
-  password: 'comp@113',
-  database: 'db_service'
-};
+
 var conn;
 
 function handleDisconnect() {
@@ -49,12 +53,7 @@ function handleDisconnect() {
 handleDisconnect();
 /**** End Data Service */
 //**** data Personal  */
-var db_config_per = {
-  host: 'localhost',
-  user: 'root',
-  password: 'comp@113',
-  database: 'dbpersonal'
-};
+
 var connPer;
 
 function handleDisconnect2() {
@@ -78,6 +77,7 @@ function handleDisconnect2() {
   });
 }
 handleDisconnect2();
+
 /**** End Data Personal */
 
 
