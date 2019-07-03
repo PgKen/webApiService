@@ -15,7 +15,7 @@ const contTitle = "ระบบจัดการโปรแกรม"
 const contFnTitle = "ระบบงานแจ้งซ่อม"
 let login
 
-
+// https://taladsrimuang.com/office/people/resize/resize_15501_PR3.jpg
 
 //**** data Service  */
 var db_config = {
@@ -299,7 +299,9 @@ router.post('/jobDetail', (req, res) => {
 router.post('/fn-chkLogin', (req, res) => {
   let data = req.body
   let valUser = "agro" + data.user
-  sql = "SELECT personal.`name`,personal.surname,`user`.username_user,depart.namedp,`user`.password_user,md5login.passmd5,`user`.idper "
+  sql = "SELECT personal.`name`,personal.surname,`user`.username_user,"
+  sql += "depart.namedp,`user`.password_user,md5login.passmd5,`user`.idper,"
+  sql += "personal.images_personal"
   sql += " FROM depart"
   sql += " INNER JOIN`user` ON`user`.depart = depart.id_dp"
   sql += " INNER JOIN personal ON`user`.idper = personal.id_pro"
@@ -308,7 +310,8 @@ router.post('/fn-chkLogin', (req, res) => {
   sql += " AND username_user = '" + valUser + "'"
   //console.log(sql);
   connPer.query(sql, (err, result) => {
-    console.log(result);
+    //console.log(result);
+    console.log("oK");
 
     if (result != "") {
       //res.send('chkLogin')
@@ -342,7 +345,9 @@ router.post('/fn-chkLogin', (req, res) => {
 router.post('/fn-listService', (req, res) => {
   let data = req.body
   let valUser = "agro" + data.user
-  sql = "SELECT personal.`name`,personal.surname,`user`.username_user,depart.namedp,`user`.password_user,md5login.passmd5,`user`.idper "
+  sql = "SELECT personal.`name`,personal.surname,`user`.username_user,"
+  sql += "depart.namedp,`user`.password_user,md5login.passmd5,`user`.idper,"
+  sql += "personal.images_personal"
   sql += " FROM depart"
   sql += " INNER JOIN`user` ON`user`.depart = depart.id_dp"
   sql += " INNER JOIN personal ON`user`.idper = personal.id_pro"
