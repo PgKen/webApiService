@@ -9,10 +9,14 @@ var unirest = require('unirest');
 
 var mysql = require('mysql')
 
-var {db_config} = require('../config/configData');
-var {db_config_per} = require('../config/configData');
+var {
+  db_config
+} = require('../config/configData');
+var {
+  db_config_per
+} = require('../config/configData');
 
-db_config =  db_config
+db_config = db_config
 
 //console.log("dddd"+db_config);
 
@@ -365,7 +369,7 @@ router.post('/fn-listService', (req, res) => {
       //res.cookie('nameUser', result[0].name)
       //res.cookie('surnameUser', result[0].surname)
       //res.send("autPass")
-      let sqlGroup = "SELECT *,job.id as jobId FROM job INNER JOIN job_mode ON job.mode_id = job_mode.id "
+      let sqlGroup = "SELECT *,job.id as jobId FROM job INNER JOIN job_mode ON job.mode_id = job_mode.id where service <> 2"
       conn.query(sqlGroup, (err, resultJob) => {
         res.send({
           username: result[0].name,
@@ -490,13 +494,23 @@ router.get('/api/podcasts', (req, res) => {
 
 router.post('/updateService', (req, res) => {
   let data = req.body
-  console.log(data);
-  sql = "UPDATE job SET service = 1,id_man_service = '" + data.valManId + "' WHERE id = " + data.valJobId
-  console.log(sql);
 
+  console.log(data);
+  let sql = "UPDATE job SET service = 1,id_man_service = '" + data.valManId + "' WHERE id = " + data.valJobId
+  console.log(sql);
   conn.query(sql, (err, result) => {
-    res.send({
-      statusLogin: 'autPass'
+    if (data.chkService == 1) {
+
+    }
+
+    let sqlInsService = "INSERT INTO service ("
+    sqlInsService += "id_job,status_service,date_service_in,date_service_start,comment_service)"
+    sqlInsService += "VALUE('" + data.valJobId + "', 0, '" + data.valDateNow + "', '" + data.dateService + "','" + data.detail + "')"
+    console.log(sqlInsService);
+    conn.query(sqlInsService, (err, insResult) => {
+      res.send({
+        statusLogin: 'autPass'
+      })
     })
   })
 })
