@@ -502,6 +502,7 @@ router.post('/updateService', (req, res) => {
   let data = req.body
 
   console.log(data);
+
   let sql = "UPDATE job SET service = 1,id_man_service = '" + data.valManId + "' WHERE id = " + data.valJobId
   console.log(sql);
   conn.query(sql, (err, result) => {
@@ -521,5 +522,41 @@ router.post('/updateService', (req, res) => {
   })
 })
 
+
+router.post('/AnsService', (req, res) => {
+  let data = req.body
+  console.log("web Ans");
+  console.log(data);
+
+  async function main() {
+    let a = await updateCause();
+    let b = await updateJobStatus();
+    let c = await sendData();
+    //console.log(a);
+    //console.log(b);
+  }
+
+  function updateCause() {
+    console.log("updateCause");
+
+    let sql = "update service SET cause = '" + data.cause + "',cause_comment='" + data.detail + "' WHERE id_job = '" + data.serviceId + "'"
+    //console.log(data.cause);
+    console.log(sql);
+    conn.query(sql, (err, result) => {})
+  }
+
+  function updateJobStatus() {
+    let sql = "UPDATE job SET service = 3 WHERE id = '" + data.serviceId + "'"
+    conn.query(sql, (err, result) => {})
+  }
+
+  function sendData() {
+    console.log("sendData");
+    res.send({
+      statusLogin: "autPass"
+    })
+  }
+  main();
+})
 
 module.exports = router;
