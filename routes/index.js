@@ -194,36 +194,36 @@ router.get('/:apiKey/dataJob', (req, res) => {
 
 
 
-router.get('/login', (req, res) => {
-  let statusLogin = req.cookies['loginCookie']
-  //console.log('xx =' + statusLogin);
-  if (statusLogin == 'yes') {
-    res.redirect('account')
-  } else {
-    res.render('login', {
-      title: contTitle,
-      subTitle: 'Login'
-    })
-  }
-})
+// router.get('/login', (req, res) => {
+//   let statusLogin = req.cookies['loginCookie']
+//   //console.log('xx =' + statusLogin);
+//   if (statusLogin == 'yes') {
+//     res.redirect('account')
+//   } else {
+//     res.render('login', {
+//       title: contTitle,
+//       subTitle: 'Login'
+//     })
+//   }
+// })
 
 
-router.get('/job', (req, res) => {
-  let statusLogin = req.cookies['loginCookie']
-  if (statusLogin == 'yes') {
-    res.render('job', {
-      title: contTitle,
-      subTitle: 'แบบฟอร์มแจ้งซ่อม',
-      moment: moment,
-      dateNow: dateNow
-    })
-  } else {
-    res.render('login', {
-      title: contTitle,
-      subTitle: 'Login'
-    })
-  }
-})
+// router.get('/job', (req, res) => {
+//   let statusLogin = req.cookies['loginCookie']
+//   if (statusLogin == 'yes') {
+//     res.render('job', {
+//       title: contTitle,
+//       subTitle: 'แบบฟอร์มแจ้งซ่อม',
+//       moment: moment,
+//       dateNow: dateNow
+//     })
+//   } else {
+//     res.render('login', {
+//       title: contTitle,
+//       subTitle: 'Login'
+//     })
+//   }
+// })
 
 
 router.get('/logout', (req, res) => {
@@ -266,6 +266,10 @@ router.get('/service-login', (req, res) => {
 
 
 router.post('/jobDetail', (req, res) => {
+  console.log("test");
+  console.log(req.body.JobId);
+  //res.send();
+
   let JobId = req.body.JobId
   let idUserLogin = req.body.idUserLogin
   console.log(("jobId = " + JobId));
@@ -273,20 +277,24 @@ router.post('/jobDetail', (req, res) => {
   // sql job Detail
   let sql = "SELECT *,job.id as jobId FROM job INNER JOIN job_mode ON job.mode_id = job_mode.id WHERE job.id = " + JobId
   conn.query(sql, (err, resultJob) => {
-    console.log(resultJob[0].user_id);
+    //console.log(resultJob[0].user_id);
     sqlSelectUser = "SELECT personal.name,personal.surname,depart.namedp,personal.id_pro "
     sqlSelectUser += "FROM depart INNER JOIN `user` ON `user`.depart = depart.id_dp "
     sqlSelectUser += "INNER JOIN personal ON `user`.idper = personal.id_pro "
     sqlSelectUser += "WHERE personal.id_pro = " + resultJob[0].user_id
-    console.log(sqlSelectUser);
+    //console.log(sqlSelectUser);
+    //console.log(resultJob);
     connPer.query(sqlSelectUser, (err, resultUser) => {
-
-      sqlUserLogin = "SELECT personal.name,personal.surname,depart.namedp,personal.id_pro "
+      //console.log(resultUser);
+      let sqlUserLogin = "SELECT personal.name,personal.surname,depart.namedp,personal.id_pro "
       sqlUserLogin += "FROM depart "
       sqlUserLogin += "INNER JOIN `user` ON `user`.depart = depart.id_dp "
       sqlUserLogin += "INNER JOIN personal ON `user`.idper = personal.id_pro "
       sqlUserLogin += "WHERE personal.id_pro = " + idUserLogin
+      //console.log(sqlUserLogin);
       connPer.query(sqlUserLogin, (err, resultUserLogin) => {
+        //console.log("-------");
+        //console.log(resultUser);
         res.send({
           statusLogin: "autPass",
           detailJob: resultJob,
@@ -296,8 +304,6 @@ router.post('/jobDetail', (req, res) => {
       })
     })
   })
-
-
 })
 
 router.post('/fn-chkLogin', (req, res) => {
