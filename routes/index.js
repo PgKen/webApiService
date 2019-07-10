@@ -306,6 +306,147 @@ router.post('/jobDetail', (req, res) => {
   })
 })
 
+/*** jobDetail */
+router.get('/jobDetail', (req, res) => {
+  //let id = req.body.id
+  //console.log("id = " + id);
+  async function main() {
+    let id = req.body.id
+    //console.log("idmain = " + id);
+    let a = await job(id);
+    //console.log(a);
+  }
+
+  function job(id) {
+    //console.log("job" + id);
+    //let sql = "SELECT * FROM job WHERE id = '" + id + "'"
+    let sql = "SELECT * FROM job "
+    sql += "INNER JOIN service ON service.id_job = job.id "
+    sql += "INNER JOIN cause ON service.cause = cause.id "
+    sql += "WHERE job.id = '" + id + "'"
+    //console.log(sql);
+    conn.query(sql, (err, result) => {
+      //console.log();
+
+      //dataService(result[0].id_man_service)
+      dataService(result)
+    })
+  }
+
+  function dataService(dataJob) {
+    //console.log(dataJob);
+
+    let sql = "SELECT personal.name,personal.surname, depart.namedp, personal.id_pro,images_personal "
+    sql += "FROM depart "
+    sql += "INNER JOIN `user` ON `user`.depart = depart.id_dp "
+    sql += "INNER JOIN personal ON `user`.idper = personal.id_pro "
+    sql += "WHERE personal.id_pro = " + dataJob[0].id_man_service
+    //console.log(sql);
+    connPer.query(sql, (err, result2) => {
+      //console.log(result2);
+      dataManSend(result2, dataJob)
+    })
+  }
+
+  function dataManSend(datamanService, dataJob) {
+    let sql = "SELECT personal.name,personal.surname, depart.namedp, personal.id_pro,images_personal "
+    sql += "FROM depart "
+    sql += "INNER JOIN `user` ON `user`.depart = depart.id_dp "
+    sql += "INNER JOIN personal ON `user`.idper = personal.id_pro "
+    sql += "WHERE personal.id_pro = " + dataJob[0].user_id
+    //console.log(sql);
+    connPer.query(sql, (err, dataManSend) => {
+      //console.log(result2);
+      //sendData(dataManSend, datamanService, dataJob)
+      dataCause(dataManSend, datamanService, dataJob)
+    })
+
+  }
+
+  function dataCause(dataManSend, datamanService, dataJob) {
+    let sql = "SELECT * FROM cause"
+    conn.query(sql, (err, dataCaue) => {
+      sendData(dataManSend, datamanService, dataJob, dataCaue)
+    })
+  }
+
+  function sendData(resManSend, resMan, resJob, resCause) {
+    //console.log(resMan);
+    //console.log(resJob);
+    res.send({
+      dataManSend: resManSend,
+      dataManService: resMan,
+      dataJob: resJob,
+      dataCause: resCause
+    })
+  }
+  main();
+})
+
+/*** End jobDetail */
+// jobPreview
+router.get('/jobDetailPreview', (req, res) => {
+  let idJob = req.body.id
+  let idUserManService = req.body.idUser
+
+  console.log("idJob = " + idJob);
+  console.log("idUser = " + idUserManService);
+
+  async function main() {
+    await dataJob();
+  }
+
+  function dataJob() {
+    sql = "SELECT * FROM job WHERE id ='" + idJob + "'"
+    console.log("sql = " + sql);
+    conn.query(sql, (err, result) => {
+      dataUserSend(result)
+    })
+  }
+
+  function dataUserSend(data) {
+    let idUser = data[0].user_id
+    let sql = "SELECT personal.name,personal.surname, depart.namedp, personal.id_pro,images_personal "
+    sql += "FROM depart "
+    sql += "INNER JOIN `user` ON `user`.depart = depart.id_dp "
+    sql += "INNER JOIN personal ON `user`.idper = personal.id_pro "
+    sql += "WHERE personal.id_pro = " + idUser
+    connPer.query(sql, (err, result) => {
+      if (err) throw err;
+      dataManSerive(data, result)
+    })
+  }
+
+  function dataManSerive(data, data2) {
+    let idUserManService = req.body.idUser
+    //let idUser = data[0].id_man_service
+    let sql = "SELECT personal.name,personal.surname, depart.namedp, personal.id_pro,images_personal "
+    sql += "FROM depart "
+    sql += "INNER JOIN `user` ON `user`.depart = depart.id_dp "
+    sql += "INNER JOIN personal ON `user`.idper = personal.id_pro "
+    sql += "WHERE personal.id_pro = " + idUserManService
+    console.log(sql);
+
+    connPer.query(sql, (err, result) => {
+      if (err) throw err;
+      dataSuccess(data, data2, result)
+    })
+  }
+
+  function dataSuccess(data1, data2, data3) {
+    res.send({
+      statusLogin: "autPass",
+      dataJob: data1,
+      dataManSend: data2,
+      dataManService: data3
+    })
+  }
+
+  main();
+
+})
+// End jobPreview
+
 router.post('/fn-chkLogin', (req, res) => {
   let data = req.body
   let valUser = "agro" + data.user
@@ -366,7 +507,7 @@ router.post('/fn-listService', (req, res) => {
   sql += " AND username_user = '" + valUser + "'"
   //console.log(sql);
   connPer.query(sql, (err, result) => {
-    console.log(result);
+    //console.log(result);
 
     if (result != "") {
       //res.send('chkLogin')
@@ -539,7 +680,12 @@ router.post('/AnsService', (req, res) => {
   function updateCause() {
     console.log("updateCause");
 
-    let sql = "update service SET cause = '" + data.cause + "',cause_comment='" + data.detail + "' WHERE id_job = '" + data.serviceId + "'"
+    let valDateNow = convertDateInDBFormate(dateNow)
+
+    let sql = "update service SET cause = '" + data.cause + "',"
+    sql += "cause_comment='" + data.detail + "',"
+    sql += "date_service_end='" + valDateNow + "'"
+    sql += " WHERE id_job = '" + data.serviceId + "'"
     //console.log(data.cause);
     console.log(sql);
     conn.query(sql, (err, result) => {})
